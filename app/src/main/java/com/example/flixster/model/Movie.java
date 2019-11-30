@@ -14,7 +14,7 @@ public class Movie {
     String overview;
 
     String BASE_URL = "https://image.tmdb.org/t/p/";
-    String POSTER_W3532 = "w352/";
+    String POSTER_W3532 = "w342/";
 
     public Movie(JSONObject jsonObject) throws JSONException {
         posterPath = jsonObject.getString("poster_path");
