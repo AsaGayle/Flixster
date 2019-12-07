@@ -26,7 +26,7 @@ import okhttp3.Headers;
 
 public class DetailActivity extends YouTubeBaseActivity {
 
-    private static final String YOUTUBE_API_KEY = "";
+    private static final String YOUTUBE_API_KEY = "AIzaSyAm8nb-4Uk13rF5ppPnxDycXqHuNy-6G6c";
     public static final String BASE_API_REQUEST = "https://api.themoviedb.org/3/movie/%d/videos?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
     //Example ending to API Request
     //209112/videos?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed
@@ -49,7 +49,7 @@ public class DetailActivity extends YouTubeBaseActivity {
         ratingBar = findViewById(R.id.ratingBar);
         tvReleaseDate = findViewById(R.id.tvDate);
         youtubePlayer = findViewById(R.id.player);
-        Movie movie = Parcels.unwrap(getIntent().getParcelableExtra("movie"));
+        final Movie movie = Parcels.unwrap(getIntent().getParcelableExtra("movie"));
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(String.format(BASE_API_REQUEST, movie.getId()), new JsonHttpResponseHandler() {
@@ -62,7 +62,11 @@ public class DetailActivity extends YouTubeBaseActivity {
                     }
                     String video_URL = results.getJSONObject(0).getString("key");
                     Log.d(TAG, video_URL);
-                    initializeYoutube(video_URL);
+                    if(movie.getRating() >= 5){
+                        initializePopular(video_URL);
+                    } else {
+                        initializeUnpopular(video_URL);
+                    }
 
                     //JSONArray results = json.jsonObject.getJSONArray("results");
                 } catch (JSONException e) {
@@ -83,7 +87,22 @@ public class DetailActivity extends YouTubeBaseActivity {
         tvReleaseDate.setText("Release Date: " + movie.getReleaseDate() +  (movie.getLanguage() == "en" ? "  |    Language: English" : " "));
     }
 
-    private void initializeYoutube(final String video_url) {
+    private void initializePopular(final String video_url) {
+        youtubePlayer.initialize(YOUTUBE_API_KEY, new YouTubePlayer.OnInitializedListener() {
+            @Override
+            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
+                Log.d( TAG, "onSuccess");
+                youTubePlayer.loadVideo(video_url);
+            }
+
+            @Override
+            public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+                Log.d( TAG, "onFailure");
+            }
+        });
+    }
+
+    private void initializeUnpopular(final String video_url) {
         youtubePlayer.initialize(YOUTUBE_API_KEY, new YouTubePlayer.OnInitializedListener() {
             @Override
             public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
